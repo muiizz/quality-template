@@ -2,7 +2,7 @@
 
 This is Project 9, `quality-template`, in Abdul Muizz's public engineering portfolio. It holds the shared local and CI quality gates that every later portfolio repo reuses.
 
-Read `PORTFOLIO_BRIEF.md` in full at the start of every session. It is the master brief. If this file and the brief differ, the brief wins.
+Read `PORTFOLIO_BRIEF.md` in full at the start of every session. It is the master brief. Muizz keeps it locally and it is not in this repo, because it names private systems. If this file and the brief differ, the brief wins.
 
 ## Non-negotiable rules
 

@@ -37,7 +37,7 @@ It copies the gate files, refuses to overwrite existing ones without `--force`, 
 ## Results
 
 Run on 23 Nov 2026 (UTC) with `make check`. Machine: AMD Ryzen 5 7535HS, 11 GB RAM, WSL2 (kernel 6.18.58.1), Python 3.12.16, Node 24.22.1.
-Commit SHA: `a4e1c8a` (clean tree, exit code 0, 2 min 25 s wall time on this rerun).
+Commit SHA: `8e47e04` (clean tree, exit code 0, 2 min 25 s wall time on this rerun). The history of this repo was rewritten on 23 Nov 2026 to remove a file, so the SHAs here are the rewritten ones; the run itself was on the original commit, which differs only by the removed brief file and two edited lines in CLAUDE.md.
 No model is called, so model and spend do not apply.
 
 | Measure | Result | Command |
@@ -50,7 +50,7 @@ No model is called, so model and spend do not apply.
 
 Branch protection proof, 23 Nov 2026: `main` requires the `check` status check, an up-to-date branch, applies to admins, and blocks force pushes and deletion (`docs/branch-protection.json`). A throwaway PR with a type error ([PR 4](https://github.com/muiizz/quality-template/pull/4), closed, not merged) failed `check` at the mypy strict hook, and `gh pr merge` was refused with "the base branch policy prohibits the merge". A direct push to `main` was rejected with "Required status check \"check\" is expected". The setting was applied with `gh api -X PUT repos/muiizz/quality-template/branches/main/protection --input docs/branch-protection.json`.
 
-Fresh clone check, 23 Nov 2026: a new `git clone` of commit `bb3457c` into an empty folder on the same machine passed `make setup && make check` (2 min 58 s, exit 0). It reused the machine's uv and npm caches, so it is not a clean machine. GitHub Actions run for the same tree: `check` passed in 2 min 4 s ([PR 5](https://github.com/muiizz/quality-template/pull/5)).
+Fresh clone check, 23 Nov 2026: a new `git clone` of commit `a16beb4` into an empty folder on the same machine passed `make setup && make check` (2 min 58 s, exit 0). It reused the machine's uv and npm caches, so it is not a clean machine. GitHub Actions run for the same tree: `check` passed in 2 min 4 s ([PR 5](https://github.com/muiizz/quality-template/pull/5)).
 
 What failed on the way: the first mutation run killed 35 of 40 mutants. The five survivors were a `<` that could become `<=` on zero amounts and two error messages nobody checked. I added tests for zero amounts and exact messages, and the score went to 40 of 40. Then the "weak tests" proof first passed wrongly: the weakened tests scored exactly 0.90 against a 0.90 bar. I raised the bar to 0.95 so that proof now blocks.
 
