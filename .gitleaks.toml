@@ -1,0 +1,15 @@
+title = "quality-template gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Tool and dependency folders are not our code"
+paths = [
+  '''(^|/)\.venv/''',
+  '''(^|/)node_modules/''',
+  '''(^|/)\.tools/''',
+  '''(^|/)mutants/''',
+  '''(^|/)\.mypy_cache/''',
+  '''(^|/)\.ruff_cache/''',
+]
