@@ -48,6 +48,8 @@ No model is called, so model and spend do not apply.
 | Mutation score, Python core | 40 killed of 40 (bar 0.95) | `make mutate` |
 | Gate proofs | 17 passed (14 injected faults, 1 clean control, 2 adoption tests) | `make prove-gates` |
 
+Branch protection proof, 23 Nov 2026: `main` requires the `check` status check, an up-to-date branch, applies to admins, and blocks force pushes and deletion (`docs/branch-protection.json`). A throwaway PR with a type error ([PR 4](https://github.com/muiizz/quality-template/pull/4), closed, not merged) failed `check` at the mypy strict hook, and `gh pr merge` was refused with "the base branch policy prohibits the merge". A direct push to `main` was rejected with "Required status check \"check\" is expected". The setting was applied with `gh api -X PUT repos/muiizz/quality-template/branches/main/protection --input docs/branch-protection.json`.
+
 What failed on the way: the first mutation run killed 35 of 40 mutants. The five survivors were a `<` that could become `<=` on zero amounts and two error messages nobody checked. I added tests for zero amounts and exact messages, and the score went to 40 of 40. Then the "weak tests" proof first passed wrongly: the weakened tests scored exactly 0.90 against a 0.90 bar. I raised the bar to 0.95 so that proof now blocks.
 
 ## Docs
@@ -56,7 +58,7 @@ What failed on the way: the first mutation run killed 35 of 40 mutants. The five
 
 ## What this does not show
 
-- It does not show that the gates stop a real contributor. Branch protection is a GitHub setting I have not shown is enabled. TODO(Muizz): enable it and add a screenshot or API output.
+- Branch protection is a GitHub setting, not a file in the repo. `docs/branch-protection.json` records what I applied, but nothing in the repo stops someone turning it off. It requires no reviews because this is a solo repo, so it does not show a review process.
 - The proofs inject one fault at a time into a copy of this repo. They do not test combinations of faults.
 - The example packages are 20 lines each. The speed and the 100% numbers will not hold for a large codebase.
 - Mutation testing covers the Python core only. TypeScript has none.
