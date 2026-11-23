@@ -4,10 +4,8 @@ This is a portfolio template. It holds no real data and runs no service.
 
 ## Reporting a problem
 
-Use GitHub private vulnerability reporting on this repository (Security tab, "Report a vulnerability").
-Please do not open a public issue for a security problem.
-
-TODO(Muizz): add a contact email here if you want one. None is listed on purpose.
+Use GitHub private vulnerability reporting on this repository: Security tab, then "Report a vulnerability".
+Please do not open a public issue for a security problem. No email address is listed on purpose.
 
 ## What is covered
 

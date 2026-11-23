@@ -1,5 +1,7 @@
 # quality-template
 
+[![check](https://github.com/muiizz/quality-template/actions/workflows/check.yml/badge.svg)](https://github.com/muiizz/quality-template/actions/workflows/check.yml)
+
 Shared local and CI quality gates for my portfolio repos. One `make check` runs the same gates on a laptop and in CI.
 
 ## What it gives you
