@@ -1,0 +1,60 @@
+# Hooks are pinned. Tool versions for the local hooks live in uv.lock and package-lock.json.
+default_install_hook_types: [pre-commit]
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # v6.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+  - repo: local
+    hooks:
+      - id: ruff-lint
+        name: ruff lint
+        entry: make -s lint-py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: ruff-format
+        name: ruff format
+        entry: make -s format-py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: mypy-strict
+        name: mypy strict
+        entry: make -s mypy
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: eslint
+        name: eslint
+        entry: make -s eslint
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: prettier
+        name: prettier
+        entry: make -s prettier
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: tsc
+        name: tsc no emit
+        entry: make -s tsc
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: sqlfluff
+        name: sqlfluff
+        entry: make -s sqlfluff
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: gitleaks
+        name: gitleaks
+        entry: make -s secrets
+        language: system
+        pass_filenames: false
+        always_run: true
