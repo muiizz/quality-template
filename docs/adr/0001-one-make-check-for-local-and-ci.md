@@ -7,12 +7,11 @@ Local checks and CI checks drift when they are written twice. A green laptop and
 (or the reverse) wastes time and hides real problems.
 
 ## Decision
-- The `Makefile` is the only place a gate is defined.
+- The `Makefile` defines the full quality gates used locally and in CI.
 - The CI workflow runs `make setup` (install from lockfiles) and then `make check`. It adds no check of its own.
-- pre-commit hooks are thin: each local hook calls a `make` target. Tool versions live in `uv.lock` and
-  `package-lock.json`, not in the hook config. Only the generic file hygiene hooks come from a pinned remote repo.
-- `make check` is `check-core` (hooks, tests, mutation) plus `prove-gates`.
-  `prove-gates` runs `check-core` against copies of the repo with one injected fault each.
+- The pre-commit hook checks staged changes. The pre-push hook calls `make check`. The language tool versions live in `uv.lock` and `package-lock.json`. The file hygiene hooks come from a pinned remote repo.
+- `make check` runs `check-core` (full lint, type, secret, and test checks) and `prove-gates`. The proofs run `check-core` against copies of the repo with one injected fault each.
+- The nightly and manually dispatched mutation workflow runs `make mutate` and `make prove-mutation`, then publishes the score and counters.
 
 ## Consequences
 - A contributor can run exactly what CI runs.

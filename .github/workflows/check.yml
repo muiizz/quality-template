@@ -22,9 +22,11 @@ jobs:
           fetch-depth: 0 # gitleaks scans history
           persist-credentials: false
       - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          version: "0.13.9"
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: "24"
+          node-version: "24.22.3"
       - name: Install from lockfiles
         run: make setup
       - name: Gates

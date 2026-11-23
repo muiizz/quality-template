@@ -4,6 +4,15 @@ import tseslint from "typescript-eslint";
 export default tseslint.config(
   { ignores: ["coverage/", "dist/", "node_modules/"] },
   js.configs.recommended,
-  ...tseslint.configs.strict,
+  {
+    files: ["**/*.ts"],
+    extends: [...tseslint.configs.strictTypeChecked],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
   { rules: { "no-var": "error", "prefer-const": "error", eqeqeq: "error" } },
 );

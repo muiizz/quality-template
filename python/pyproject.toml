@@ -2,7 +2,7 @@
 name = "qtemplate"
 version = "0.1.0"
 description = "Tiny example package used to prove the quality gates."
-requires-python = ">=3.12"
+requires-python = "~=3.12"
 dependencies = []
 
 [dependency-groups]
@@ -27,9 +27,12 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "S", "C4", "SIM", "RUF"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["qtemplate"]
+
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101"]
-"proofs/*" = ["S101", "S603", "S607"]
+"**/tests/*" = ["S101"]
+"**/proofs/*" = ["S101", "S603", "S607"]
 
 [tool.mypy]
 strict = true
@@ -39,6 +42,7 @@ files = ["qtemplate", "tests", "evals", "tools", "proofs"]
 pythonpath = ["."]
 testpaths = ["tests"]
 addopts = "-ra"
+markers = ["mutation: proof that the mutation gate rejects weak tests"]
 
 [tool.coverage.run]
 branch = true

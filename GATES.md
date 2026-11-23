@@ -1,15 +1,14 @@
 # Gates: why each one exists
 
-Every gate runs the same way on a laptop and in CI, because CI only calls `make check`.
-Each gate is proven by a test in `python/proofs/test_gates.py` that injects the fault it targets.
+Local pre-push and required CI both call `make check`. The nightly mutation workflow calls `make mutate` and `make prove-mutation`. Each gate has a fault proof in `python/proofs/test_gates.py`.
 
 | Gate | Tool (pinned) | The mistake it stops | Proof case |
 |---|---|---|---|
-| Secret scan | gitleaks 8.30.1 | A key or token committed by accident. Once pushed, it must be rotated. | `fake-secret` |
+| Secret scan | gitleaks 8.30.1 | A key or token in the index, working tree, or Git history. | `fake-secret` |
 | Python lint | ruff 0.17.6 | Unused imports, likely bugs, unsafe calls. | `python-lint-error` |
 | Python format | ruff format | Style arguments in review. | `python-format-error` |
 | Python types | mypy 2.4.1, strict | Wrong types that tests do not reach. | `python-type-error` |
-| TypeScript lint | eslint 10.15.0 | `var`, loose equality, unused code. | `typescript-lint-error` |
+| TypeScript lint | eslint 10.15.0 | `var`, loose equality, unused code, and unsafe assignments from `any`. | `typescript-lint-error`, `typescript-type-aware-lint-error` |
 | TypeScript format | prettier 3.10.1 | Style arguments in review. | `typescript-format-error` |
 | TypeScript types | tsc 6.0.3, strict, `--noEmit` | Type errors in code that is never run by a test. | `typescript-type-error` |
 | SQL lint | sqlfluff 4.5.0 | Inconsistent or unsafe SQL style. | `sql-lint-error` |

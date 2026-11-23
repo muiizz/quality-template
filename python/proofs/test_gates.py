@@ -1,7 +1,7 @@
 """Proof that each gate blocks the fault it exists for.
 
 Each test copies this repo to a temp folder, injects exactly one fault, and runs the same
-command CI runs for the gates (`make check-core`). It then asserts the run failed and that the
+gate target used in CI. It then asserts the run failed and that the
 expected gate is the one that reported it. A clean copy must pass, so a broken harness cannot
 make the proofs pass by accident.
 
@@ -116,6 +116,7 @@ class Case:
     fault: Callable[[Path], None]
     # Regexes that must all match the combined output (multi-line mode).
     expect: tuple[str, ...]
+    target: str = "check-core"
 
 
 CASES = [
@@ -148,6 +149,16 @@ CASES = [
         "typescript-lint-error",
         append("ts/src/core.ts", "\nexport var legacy = 1;\n"),
         (r"^eslint\.+Failed",),
+    ),
+    Case(
+        "typescript-type-aware-lint-error",
+        append(
+            "ts/src/core.ts",
+            "\nexport function parseValue(): unknown {\n"
+            '  const value: string = JSON.parse("null");\n'
+            "  return value;\n}\n",
+        ),
+        (r"^eslint\.+Failed", r"@typescript-eslint/no-unsafe-assignment"),
     ),
     Case(
         "typescript-format-error",
@@ -202,8 +213,15 @@ CASES = [
                 "",
                 regex=True,
             ),
+            replace(
+                "python/tests/test_core.py",
+                r"\n@given\(st.integers.*\Z",
+                "",
+                regex=True,
+            ),
         ),
         (r"gate: mutation score", r"mutation gate: killed \d+ of \d+"),
+        target="mutate",
     ),
 ]
 
@@ -225,10 +243,12 @@ def make_copy(tmp_path: Path) -> Path:
     return root
 
 
-def run_gates(root: Path, env: dict[str, str]) -> subprocess.CompletedProcess[str]:
+def run_gates(
+    root: Path, env: dict[str, str], target: str = "check-core"
+) -> subprocess.CompletedProcess[str]:
     subprocess.run(["git", "add", "-A"], cwd=root, check=True)
     return subprocess.run(
-        ["make", "check-core"],
+        ["make", target],
         cwd=root,
         env=env,
         text=True,
@@ -243,11 +263,19 @@ def test_clean_copy_passes(tmp_path: Path, tool_env: dict[str, str]) -> None:
     assert result.returncode == 0, result.stdout[-3000:] + result.stderr[-3000:]
 
 
-@pytest.mark.parametrize("case", CASES, ids=[c.name for c in CASES])
+@pytest.mark.parametrize(
+    "case",
+    [
+        pytest.param(case, id=case.name, marks=pytest.mark.mutation)
+        if case.target == "mutate"
+        else pytest.param(case, id=case.name)
+        for case in CASES
+    ],
+)
 def test_fault_is_blocked(case: Case, tmp_path: Path, tool_env: dict[str, str]) -> None:
     root = make_copy(tmp_path)
     case.fault(root)
-    result = run_gates(root, tool_env)
+    result = run_gates(root, tool_env, case.target)
     output = result.stdout + result.stderr
     assert result.returncode != 0, f"{case.name} was NOT blocked"
     for pattern in case.expect:

@@ -7,21 +7,30 @@ Shared local and CI quality gates for my portfolio repos. One `make check` runs 
 ## What it gives you
 
 - Python: ruff, ruff format, mypy strict, pytest with a 90% coverage bar, hypothesis, mutation testing with mutmut.
-- TypeScript: eslint, prettier, `tsc --noEmit`, vitest with a 90% coverage bar.
+- TypeScript: type-aware eslint, prettier, `tsc --noEmit`, vitest with a 90% coverage bar.
 - SQL: sqlfluff. Secrets: gitleaks. File hygiene: end-of-file, trailing whitespace, large files.
 - CI (`.github/workflows/check.yml`) installs from lockfiles, then calls `make check`. Nothing else.
+- Mutation: the nightly and manually dispatched workflow enforces the 95% mutation bar and publishes the score and raw counts.
 - Proofs: each gate is shown to block a fault by a test (`python/proofs/test_gates.py`). See `GATES.md`.
 
 ## Run it
 
 ```bash
-make setup        # installs from lockfiles (needs uv, Node 24, git, curl)
-make check        # every gate, then the gate proofs (about 3 minutes)
+make setup        # installs from lockfiles (needs uv 0.13.9, Node 24.22.3, git, curl)
+make check        # local and required CI gates, then their fault proofs
+make mutate       # standalone mutation score
+make prove-mutation  # prove that the mutation gate catches weak tests
 make demo         # runs both example packages
 make eval-smoke   # free, deterministic smoke eval that other repos inherit
 ```
 
-`make check` runs `check-core` (hooks, tests, mutation) and then `prove-gates`.
+`make check` runs the full lint, type, secret, and test gates, then `prove-gates`. Setup installs two Git hooks. The pre-commit hook scans staged changes for secrets and checks staged Python, whitespace, and file size. The pre-push hook runs `make check`, the same target used by pull-request CI.
+
+### Gitleaks on macOS and Windows
+
+Linux x86-64 setup downloads and verifies gitleaks automatically. On macOS, download the Darwin archive for your architecture from the [gitleaks 8.30.1 release](https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1), compare `shasum -a 256` against the published checksums, and place the unpacked executable at `.tools/gitleaks`. Verify with `.tools/gitleaks version`, then run `make setup`.
+
+On Windows, use WSL2 and follow the Linux instructions. For a native installation, download the Windows ZIP for your architecture from the same release, compare `Get-FileHash -Algorithm SHA256` against the published checksums, and run `gitleaks.exe version` after extracting it. The template's Make and hook commands use Bash.
 
 ## Adopt it in another repo
 
@@ -56,7 +65,7 @@ What failed on the way: the first mutation run killed 35 of 40 mutants. The five
 
 ## Docs
 
-`GATES.md` (why each gate exists), `docs/adr/` (decisions), `INTERVIEW.md` (hard questions), `SECURITY.md`.
+`GATES.md` (why each gate exists), [local gate evidence](docs/evidence.md), [mutation evidence](docs/mutation.md), `docs/adr/` (decisions), `INTERVIEW.md` (hard questions), `SECURITY.md`.
 
 ## What this does not show
 
@@ -64,12 +73,11 @@ What failed on the way: the first mutation run killed 35 of 40 mutants. The five
 - The proofs inject one fault at a time into a copy of this repo. They do not test combinations of faults.
 - The example packages are 20 lines each. The speed and the 100% numbers will not hold for a large codebase.
 - Mutation testing covers the Python core only. TypeScript has none.
-- The gitleaks installer works on Linux x86_64 only. The gates ran on one local machine (above) and on GitHub-hosted Ubuntu runners. I have not tried macOS, Windows or arm64.
+- The automated gitleaks installer targets Linux x86-64. The recorded gate runs cover WSL2 and GitHub-hosted Ubuntu.
 - No paid model is called here, so the spend cap rule is stated but not exercised.
 
 ## What I would do next
 
-- Turn on branch protection and require the `check` job.
 - Add a drift check that compares an adopting repo with the template commit it records.
 - Add Stryker mutation testing for the TypeScript core.
 - Cache the proof runs so `make check` is faster on a large repo.
