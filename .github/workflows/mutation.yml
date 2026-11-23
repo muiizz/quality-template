@@ -1,0 +1,49 @@
+name: mutation
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mutation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  score:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          version: "0.13.9"
+      - name: Install Python dependencies
+        working-directory: python
+        run: uv sync --frozen
+      - name: Score the Python core
+        shell: bash
+        run: make mutate 2>&1 | tee mutation.txt
+      - name: Summarize mutation score
+        if: always()
+        run: |
+          if grep '^mutation gate:' mutation.txt >> "$GITHUB_STEP_SUMMARY"; then
+            exit 0
+          fi
+          echo "Mutation scoring ended before reporting a score. See the workflow log." >> "$GITHUB_STEP_SUMMARY"
+      - name: Prove the score blocks weak tests
+        if: always()
+        run: make prove-mutation
+      - name: Publish mutation results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: mutation-results
+          path: |
+            mutation.txt
+            python/mutants/mutmut-cicd-stats.json

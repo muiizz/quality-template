@@ -39,3 +39,13 @@ def test_zero_amounts_are_allowed() -> None:
 def test_negative_amounts_are_refused(args: tuple[float, float, float]) -> None:
     with pytest.raises(ValueError, match=r"^amounts must not be negative$"):
         check_spend(*args)
+
+
+@given(st.integers(0, 1_000_000), st.integers(0, 1_000_000))
+def test_spend_cap_boundary(spent: int, next_cost: int) -> None:
+    # These integral dollar amounts are exactly representable as floats.
+    total = spent + next_cost
+    assert check_spend(spent, next_cost, total) == total
+    if total > 0:
+        with pytest.raises(SpendCapError):
+            check_spend(spent, next_cost, total - 1)

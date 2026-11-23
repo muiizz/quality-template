@@ -8,7 +8,7 @@ NPMD := npm --prefix ts
 GITLEAKS := $(CURDIR)/.tools/gitleaks
 
 .PHONY: setup check check-core precommit lint-py format-py mypy eslint prettier tsc sqlfluff \
-        secrets test test-py test-ts mutate prove-gates demo eval-smoke update-gates
+        secrets staged-secrets test test-py test-ts mutate prove-gates prove-mutation demo eval-smoke update-gates
 
 setup:  ## Install everything from the lockfiles. Safe to run again.
 	$(PYD) uv sync --frozen
@@ -18,11 +18,11 @@ setup:  ## Install everything from the lockfiles. Safe to run again.
 
 check: check-core prove-gates  ## Every gate, then the proof that each gate blocks a fault.
 
-check-core: precommit test mutate
+check-core: precommit test
 
 precommit:
 	@echo "==> gate: pre-commit hooks"
-	$(PYD) $(UV) pre-commit run --all-files --config ../.pre-commit-config.yaml
+	$(PYD) $(UV) pre-commit run --all-files --hook-stage manual --config ../.pre-commit-config.yaml
 
 # Targets below are the hook bodies. Hooks call these, so the versions live in the lockfiles.
 lint-py:
@@ -39,6 +39,10 @@ tsc:
 	$(NPMD) run --silent typecheck
 sqlfluff:
 	$(PYD) $(UV) sqlfluff lint ../sql --config ../.sqlfluff
+staged-secrets:
+	scripts/install-gitleaks.sh
+	$(GITLEAKS) git --staged . --config .gitleaks.toml --no-banner --redact
+
 secrets:
 	scripts/install-gitleaks.sh
 	$(GITLEAKS) dir . --config .gitleaks.toml --no-banner --redact
@@ -60,7 +64,10 @@ mutate:
 
 prove-gates:
 	@echo "==> gate: proofs that each gate blocks a fault"
-	$(PYD) $(UV) pytest proofs -p no:cacheprovider --no-cov
+	$(PYD) $(UV) pytest proofs -m "not mutation" -p no:cacheprovider --no-cov
+
+prove-mutation:
+	$(PYD) $(UV) pytest proofs/test_gates.py -m mutation -p no:cacheprovider --no-cov
 
 demo:  ## Run both example packages.
 	$(PYD) $(UV) python -m qtemplate

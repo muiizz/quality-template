@@ -15,9 +15,11 @@ FILES=(
   .gitleaks.toml
   .sqlfluff
   scripts/install-gitleaks.sh
+  python/.python-version
   python/tools/mutation_gate.py
   .github/pull_request_template.md
   .github/workflows/check.yml
+  .github/workflows/mutation.yml
   .github/workflows/codeql.yml
   .github/dependabot.yml
   SECURITY.md
