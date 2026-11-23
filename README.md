@@ -35,12 +35,12 @@ It copies the gate files, refuses to overwrite existing ones without `--force`, 
 ## Results
 
 Run on 23 Nov 2026 (UTC) with `make check`. Machine: AMD Ryzen 5 7535HS, 11 GB RAM, WSL2 (kernel 6.18.58.1), Python 3.12.16, Node 24.22.1.
-Commit SHA: TODO(Muizz): the run above was on an uncommitted tree. Commit, rerun `make check`, and paste the SHA here.
+Commit SHA: `a4e1c8a` (clean tree, exit code 0, 2 min 25 s wall time on this rerun).
 No model is called, so model and spend do not apply.
 
 | Measure | Result | Command |
 |---|---|---|
-| Whole `make check` | 2 min 20 s wall time (one run) | `make check` |
+| Whole `make check` | 2 min 20 s and 2 min 25 s (two runs) | `make check` |
 | Python tests and branch coverage | 11 passed, 100% (bar 90%) | `make test-py` |
 | TypeScript tests and coverage | 7 passed, 100% (bar 90%) | `make test-ts` |
 | Mutation score, Python core | 40 killed of 40 (bar 0.95) | `make mutate` |
