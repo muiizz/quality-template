@@ -50,6 +50,8 @@ No model is called, so model and spend do not apply.
 
 Branch protection proof, 23 Nov 2026: `main` requires the `check` status check, an up-to-date branch, applies to admins, and blocks force pushes and deletion (`docs/branch-protection.json`). A throwaway PR with a type error ([PR 4](https://github.com/muiizz/quality-template/pull/4), closed, not merged) failed `check` at the mypy strict hook, and `gh pr merge` was refused with "the base branch policy prohibits the merge". A direct push to `main` was rejected with "Required status check \"check\" is expected". The setting was applied with `gh api -X PUT repos/muiizz/quality-template/branches/main/protection --input docs/branch-protection.json`.
 
+Fresh clone check, 23 Nov 2026: a new `git clone` of commit `bb3457c` into an empty folder on the same machine passed `make setup && make check` (2 min 58 s, exit 0). It reused the machine's uv and npm caches, so it is not a clean machine. GitHub Actions run for the same tree: `check` passed in 2 min 4 s ([PR 5](https://github.com/muiizz/quality-template/pull/5)).
+
 What failed on the way: the first mutation run killed 35 of 40 mutants. The five survivors were a `<` that could become `<=` on zero amounts and two error messages nobody checked. I added tests for zero amounts and exact messages, and the score went to 40 of 40. Then the "weak tests" proof first passed wrongly: the weakened tests scored exactly 0.90 against a 0.90 bar. I raised the bar to 0.95 so that proof now blocks.
 
 ## Docs
@@ -62,7 +64,7 @@ What failed on the way: the first mutation run killed 35 of 40 mutants. The five
 - The proofs inject one fault at a time into a copy of this repo. They do not test combinations of faults.
 - The example packages are 20 lines each. The speed and the 100% numbers will not hold for a large codebase.
 - Mutation testing covers the Python core only. TypeScript has none.
-- The gitleaks installer works on Linux x86_64 only. The gates were run on one machine (below) and on GitHub Actions only once this repo is pushed.
+- The gitleaks installer works on Linux x86_64 only. The gates ran on one local machine (above) and on GitHub-hosted Ubuntu runners. I have not tried macOS, Windows or arm64.
 - No paid model is called here, so the spend cap rule is stated but not exercised.
 
 ## What I would do next
