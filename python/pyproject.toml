@@ -1,0 +1,54 @@
+[project]
+name = "qtemplate"
+version = "0.1.0"
+description = "Tiny example package used to prove the quality gates."
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "ruff==0.17.6",
+  "mypy==2.4.1",
+  "pytest==9.2.0",
+  "pytest-cov==7.1.0",
+  "hypothesis==6.170.17",
+  "mutmut==3.8.1",
+  "pre-commit==4.7.0",
+  "sqlfluff==4.5.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "C4", "SIM", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+"proofs/*" = ["S101", "S603", "S607"]
+
+[tool.mypy]
+strict = true
+files = ["qtemplate", "tests", "evals", "tools", "proofs"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.coverage.run]
+branch = true
+source = ["qtemplate"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+
+[tool.mutmut]
+source_paths = ["qtemplate/core.py"]
+pytest_add_cli_args_test_selection = ["tests/"]
+also_copy = ["qtemplate/__main__.py"]

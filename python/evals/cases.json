@@ -1,0 +1,5 @@
+[
+  {"input": "  Hello   WORLD ", "expected": "hello world"},
+  {"input": "ABC", "expected": "abc"},
+  {"input": "a\tb\nc", "expected": "a b c"}
+]
