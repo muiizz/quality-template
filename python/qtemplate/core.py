@@ -28,3 +28,5 @@ def check_spend(spent_usd: float, next_cost_usd: float, cap_usd: float) -> float
     if total > cap_usd:
         raise SpendCapError(f"spend {total:.2f} would pass cap {cap_usd:.2f}")
     return total
+
+BAD: int = "text"
